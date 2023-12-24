@@ -1,20 +1,36 @@
 version: '3.8'
 services:
   app:
-    build: ./deployments/Docker/Dockerfile
+    container_name: golang-app
+    build:
+      dockerfile: ./deployments/Docker/Dockerfile
     environment:
       DB_HOST: ${DB_HOST}
       DB_PORT: ${DB_PORT}
+    ports:
+      - "8000:8000"
     depends_on:
       - db
+    networks:
+      - backend
+
   db:
+    container_name: postgres-db
     image: postgres:latest
+    restart: always
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
 
 volumes:
   postgres_data:
+
+networks:
+  backend:
